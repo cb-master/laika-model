@@ -184,13 +184,13 @@ class Blueprint
             throw new InvalidArgumentException("ENUM column must have at least one allowed value.");
         }
 
-        $quotedValues = array_map(fn($v) => "'".addslashes($v)."'", $values);
+        $quotedValues = array_map(fn ($v) => "'".addslashes($v)."'", $values);
         $enumList = implode(', ', $quotedValues);
         $null = $null ? ' NULL' : ' NOT NULL';
 
         $defaultClause = '';
-        if($default !== null){
-            if(!in_array($default, $values, true)){
+        if ($default !== null) {
+            if (!in_array($default, $values, true)) {
                 throw new InvalidArgumentException("Default value '{$default}' is not in the allowed ENUM values.");
             }
             $defaultClause = " DEFAULT '" . addslashes($default) . "'";
@@ -339,7 +339,6 @@ class Blueprint
 
         // Collation
         $sql .= $this->collation ? " COLLATE {$this->collation}" : " COLLATE utf8mb4_unicode_ci";
-
         // Create Table SQL
         return "CREATE TABLE IF NOT EXISTS {$this->table} {$sql}";
     }

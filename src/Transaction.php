@@ -27,9 +27,9 @@ class Transaction Extends DB
     public static function run(Closure $callback, string $connection_name = 'default'): array
     {
         try {
-            $db = self::getInstance($connection_name);
+            $db     =   self::getInstance($connection_name);
             $db->pdo->beginTransaction();
-            $result = $callback($db);
+            $result =   $callback($db);
 
             $db->pdo->commit();
 
@@ -37,7 +37,7 @@ class Transaction Extends DB
                 'error'     =>  false,
                 'message'   =>  $result
             ];
-        } catch(PDOException $e) {
+        } catch (PDOException $e) {
             $db->pdo->rollBack();
             return [
                 'error'     =>  true,

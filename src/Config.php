@@ -26,8 +26,8 @@ class Config
      */
     public function __construct(array $config)
     {
-        $this->config = $config;
-        $this->pdo = $this->createPDO();
+        $this->config   =   $config;
+        $this->pdo      =   $this->createPDO();
     }
 
     public function getPDO(): PDO
@@ -52,16 +52,15 @@ class Config
         $driverInstance = new $driverClass();
         $dsn = $driverInstance->dsn($this->config);
 
-        $username = $this->config['username'] ?? null;
-        $password = $this->config['password'] ?? null;
-        $options = $this->config['options'] ?? [];
+        $username   =   $this->config['username'] ?? null;
+        $password   =   $this->config['password'] ?? null;
+        $options    =   $this->config['options'] ?? [];
 
         $defaultOptions = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ];
         $options += $defaultOptions;
-
         return new PDO($dsn, $username, $password, $defaultOptions);
     }
 }

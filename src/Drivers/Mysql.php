@@ -24,7 +24,6 @@ class Mysql
     public function dsn(array $config): string
     {
         $host = $config['host'] ?? 'localhost';
-
         // Check 'database' key exists
         if (!isset($config['database']) && !$config['database']) {
             throw new RuntimeException("'database' Key Missing or Invalid!");
@@ -32,7 +31,6 @@ class Mysql
         $database = $config['database'];
         $port = $config['port'] ?? 3306;
         $charset = $config['charset'] ?? 'utf8mb4';
-
         return "mysql:host={$host};port={$port};dbname={$database};charset={$charset}";
     }
 }

@@ -24,15 +24,12 @@ class Pgsql
     public function dsn(array $config): string
     {
         $host = $config['host'] ?? 'localhost';
-        
         // Check 'database' key exists
         if (!isset($config['database']) && !$config['database']) {
             throw new RuntimeException("'database' Key Missing or Invalid!");
         }
         $database = $config['database'];
-
         $port = (isset($config['port']) && $config['port']) ? $config['port'] : 5432;
-
         return "pgsql:host={$host};port={$port};dbname={$database}";
     }
 }

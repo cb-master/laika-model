@@ -115,9 +115,9 @@ abstract class Model
      */
     public function uuid(?string $column = null): string
     {
-        $column = $column ?: $this->uuid;
-        $time = substr(str_replace('.', '', microtime(true)), -6);
-        $uid = 'uuid-'.bin2hex(random_bytes(3)).'-'.bin2hex(random_bytes(3)).'-'.bin2hex(random_bytes(3)).'-'.bin2hex(random_bytes(3)).'-'.$time;
+        $column =   $column ?: $this->uuid;
+        $time   =   substr(str_replace('.', '', microtime(true)), -6);
+        $uid    =   'uuid-'.bin2hex(random_bytes(3)).'-'.bin2hex(random_bytes(3)).'-'.bin2hex(random_bytes(3)).'-'.bin2hex(random_bytes(3)).'-'.$time;
         // Check Already Exist & Return
         if ($this->db->table($this->table)->where($column, '=', $uid)->first()) {
             return $this->uuid($column);
@@ -129,7 +129,7 @@ abstract class Model
     public function count(string $column = null, array $where = [], string $operator = '=', string $compare = 'AND'): int
     {
         $column = $column ?: $this->id;
-        return $where ? $this->db->table($this->table)->where($where, $operator, null, $compare)->count($column):
+        return $where ? $this->db->table($this->table)->where($where, $operator, null, $compare)->count($column) :
                         $this->db->table($this->table)->count($column);
     }
 }

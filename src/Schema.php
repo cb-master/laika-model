@@ -56,8 +56,8 @@ class Schema
     public static function drop(string $table): void
     {
         // Make sure table name is valid, no user inputs should be allowed
-        $table = self::sanitizeTableName($table);
-        $sql = "DROP TABLE IF EXISTS {$table}";
+        $table  =   self::sanitizeTableName($table);
+        $sql    =   "DROP TABLE IF EXISTS {$table}";
 
         self::execute($sql);
     }
@@ -69,13 +69,13 @@ class Schema
      */
     protected static function execute(string $sql): void
     {
-        try{
-            if(empty(self::$pdo)){
+        try {
+            if (empty(self::$pdo)) {
                 throw new Exception("Database connection is not set.");
             }
 
             self::$pdo->exec($sql);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             throw new Exception("Migration failed: {$e->getMessage()}", 0, $e);
         }
     }

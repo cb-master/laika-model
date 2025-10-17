@@ -21,17 +21,17 @@ class DB
 {
     private static ?self $instance = null;
     protected PDO $pdo;
-    protected string $table = '';
-    protected string $columns = '*';
-    protected array $joins = [];
-    protected array $wheres = [];
-    protected array $bindings = [];
-    protected array $groupBy = [];
-    protected array $orderBy = [];
-    protected ?int $limit = null;
-    protected ?int $offset = null;
-    protected array $having = [];
-    protected string $name = '';
+    protected string $table     =   '';
+    protected string $columns   =   '*';
+    protected array $joins      =   [];
+    protected array $wheres     =   [];
+    protected array $bindings   =   [];
+    protected array $groupBy    =   [];
+    protected array $orderBy    =   [];
+    protected ?int $limit       =   null;
+    protected ?int $offset      =   null;
+    protected array $having     =   [];
+    protected string $name      =   '';
 
     private function __construct(string $name = 'default')
     {
@@ -70,15 +70,15 @@ class DB
      */
     protected function reset(): void
     {
-        $this->columns = '*';
-        $this->joins = [];
-        $this->wheres = [];
-        $this->bindings = [];
-        $this->groupBy = [];
-        $this->orderBy = [];
-        $this->limit = null;
-        $this->offset = null;
-        $this->having = [];
+        $this->columns  =   '*';
+        $this->joins    =   [];
+        $this->wheres   =   [];
+        $this->bindings =   [];
+        $this->groupBy  =   [];
+        $this->orderBy  =   [];
+        $this->limit    =   null;
+        $this->offset   =   null;
+        $this->having   =   [];
     }
 
     // Set the columns to select
@@ -139,7 +139,7 @@ class DB
      */
     public function whereLike(array $where, string $compare = 'AND'): object
     {
-        foreach($where as $col => $val){
+        foreach($where as $col => $val) {
             $this->addWhere("{$col} LIKE ?", [$val], strtoupper($compare));
         }
         return $this;
@@ -229,8 +229,8 @@ class DB
      */
     public function having(string $column, string $operator, mixed $value): self
     {
-        $this->having[] = "{$column} {$operator} ?";
-        $this->bindings[] = $value;
+        $this->having[]     =   "{$column} {$operator} ?";
+        $this->bindings[]   =   $value;
         return $this;
     }
 
@@ -276,11 +276,11 @@ class DB
      */
     public function get(): array
     {
-        $sql = $this->buildSelectSQL();
-        $stmt = $this->pdo->prepare($sql);
+        $sql    =   $this->buildSelectSQL();
+        $stmt   =   $this->pdo->prepare($sql);
         $stmt->execute($this->bindings);
 
-        $result = $stmt->fetchAll();
+        $result =   $stmt->fetchAll();
         $this->reset();
         return $result;
     }
@@ -292,8 +292,8 @@ class DB
     public function first(): array
     {
         $this->limit(1);
-        $result = $this->get();
-        $first = $result[0] ?? [];
+        $result =   $this->get();
+        $first  =   $result[0] ?? [];
         return $first;
     }
 
