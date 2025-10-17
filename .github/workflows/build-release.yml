@@ -1,0 +1,226 @@
+name: Laika Model CI Pipeline
+
+on:
+  push:
+    branches: [ main, beta ]
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches: [ main, beta ]
+  workflow_dispatch:
+
+jobs:
+  ########################################################
+  # 1/ TEST SUITE
+  ########################################################
+  test:
+    name: Run Tests (PHP ${{ matrix.php-version }})
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test
+          MYSQL_USER: laika
+          MYSQL_PASSWORD: 1234567890#ABcd
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: test
+          POSTGRES_USER: laika
+          POSTGRES_PASSWORD: 1234567890#ABcd
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U laika"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+    strategy:
+      matrix:
+        php-version: ['8.1','8.2','8.3']
+        db: [mysql, pgsql, sqlite]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor
+            ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, json, dom
+          coverage: xdebug
+          tools: composer
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Set database env vars
+        run: |
+          if [ "${{ matrix.db }}" == "mysql" ]; then
+            echo "DB_DRIVER=mysql" >> $GITHUB_ENV
+            echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
+            echo "DB_PORT=3306" >> $GITHUB_ENV
+            echo "DB_USER=laika" >> $GITHUB_ENV
+            echo "DB_PASS=1234567890#ABcd" >> $GITHUB_ENV
+            echo "DB_NAME=test" >> $GITHUB_ENV
+          elif [ "${{ matrix.db }}" == "pgsql" ]; then
+            echo "DB_DRIVER=pgsql" >> $GITHUB_ENV
+            echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
+            echo "DB_PORT=5432" >> $GITHUB_ENV
+            echo "DB_USER=laika" >> $GITHUB_ENV
+            echo "DB_PASS=1234567890#ABcd" >> $GITHUB_ENV
+            echo "DB_NAME=test" >> $GITHUB_ENV
+          else
+            echo "DB_DRIVER=sqlite" >> $GITHUB_ENV
+            echo "DB_PATH=:memory:" >> $GITHUB_ENV
+          fi
+
+      - name: Wait for database readiness
+        run: |
+          if [ "${{ matrix.db }}" == "mysql" ]; then
+            for i in {1..10}; do
+              if mysqladmin ping -h 127.0.0.1 -ulaika -p1234567890#ABcd --silent; then
+                echo "MySQL ready"; break
+              fi
+              sleep 3
+            done
+          elif [ "${{ matrix.db }}" == "pgsql" ]; then
+            for i in {1..10}; do
+              if pg_isready -h 127.0.0.1 -U laika; then
+                echo "Postgres ready"; break
+              fi
+              sleep 3
+            done
+          fi
+
+      - name: Run Test Suite
+        run: composer test
+        
+
+
+  ########################################################
+  # 2/ STATIC ANALYSIS & LINTING
+  ########################################################
+  lint:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    needs: [test]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor
+            ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          tools: composer
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Run PHP CS Fixer (dry run)
+        run: |
+          composer global require friendsofphp/php-cs-fixer
+          ~/.config/composer/vendor/bin/php-cs-fixer fix --dry-run --diff src
+
+
+  ########################################################
+  # 3/ BUILD & RELEASE
+  ########################################################
+  release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+    needs: [lint]
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor
+            ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          tools: composer
+
+      - name: Install dependencies (no dev)
+        run: composer install --no-dev --prefer-dist --no-progress
+
+      - name: Prepare release artifact
+        run: |
+          mkdir build
+          cp -r src composer.json LICENSE README.md build/
+          echo "v${{ github.run_number }}" > build/VERSION
+          cd build && zip -r ../laika-model.zip .
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: laika-model
+          path: laika-model.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: "Laika Model v${{ github.run_number }}"
+          body: "Automated release build."
+          files: laika-model.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
