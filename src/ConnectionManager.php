@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika Database Model
  * Author: Showket Ahmed

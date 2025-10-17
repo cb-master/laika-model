@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika Database Model
  * Author: Showket Ahmed
@@ -25,7 +26,7 @@ class Transaction Extends DB
      */
     public static function run(Closure $callback, string $connection_name = 'default'): array
     {
-        try{
+        try {
             $db = self::getInstance($connection_name);
             $db->pdo->beginTransaction();
             $result = $callback($db);
@@ -33,14 +34,14 @@ class Transaction Extends DB
             $db->pdo->commit();
 
             return [
-                'error' =>  false,
-                'message'=> $result
+                'error'     =>  false,
+                'message'   =>  $result
             ];
-        }catch(PDOException $e){
+        } catch(PDOException $e) {
             $db->pdo->rollBack();
             return [
-                'error'=>true,
-                'message'=>$e->getMessage()
+                'error'     =>  true,
+                'message'   =>  $e->getMessage()
             ];
         }
     }
