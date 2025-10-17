@@ -63,7 +63,7 @@ $pdo = ConnectionManager::get('write');
 // Get Other PDO Connection if Configured
 $pdo = ConnectionManager::get('other');
 ```
-Now you can execute any query bu using any PDO methods.
+Now you can execute any query by using any PDO methods.
 ### Get Laika Model Prebuild Methods
 To use Laika Prebuild methods instead of PDO Methods you can use DB Class from Laika model.
 
