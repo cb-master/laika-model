@@ -139,7 +139,7 @@ class DB
      */
     public function whereLike(array $where, string $compare = 'AND'): object
     {
-        foreach($where as $col => $val) {
+        foreach ($where as $col => $val) {
             $this->addWhere("{$col} LIKE ?", [$val], strtoupper($compare));
         }
         return $this;
@@ -312,7 +312,7 @@ class DB
         $this->reset();
         return (int) ($result['count'] ?? 0);
     }
-    
+
     // Insert a single row
     /**
      * @param array<string,string|int|null> $data Required data to insert
@@ -514,7 +514,7 @@ class DB
         $sql = $this->buildSelectSQL();
         $bindings = $this->bindings;
 
-        $sql = preg_replace_callback('/\?/', function() use (&$bindings) {
+        $sql = preg_replace_callback('/\?/', function () use (&$bindings) {
             $value = array_shift($bindings);
             if (is_numeric($value)) {
                 return $value;
@@ -529,7 +529,8 @@ class DB
     /**
      * @throws Exception Throws an exception if cloning is attempted
      */
-    private function __clone(){
+    private function __clone()
+    {
         throw new Exception('Cloning is not allowed.');
     }
 
@@ -537,7 +538,8 @@ class DB
     /**
      * @throws Exception Throws an exception if serialization is attempted
      */
-    public function __wakeup(){
+    public function __wakeup()
+    {
         throw new Exception('Unserializing is not allowed.');
     }
 }

@@ -16,7 +16,7 @@ namespace Laika\Model;
 use PDOException;
 use Closure;
 
-class Transaction Extends DB
+class Transaction extends DB
 {
     // Run Transaction
     /**

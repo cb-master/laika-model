@@ -180,7 +180,7 @@ class Blueprint
      */
     public function enum(string $name, array $values, ?string $default = null, bool $null = false): self
     {
-        if(empty($values)){
+        if (empty($values)) {
             throw new InvalidArgumentException("ENUM column must have at least one allowed value.");
         }
 
