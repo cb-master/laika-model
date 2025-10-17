@@ -6,7 +6,7 @@ on:
     tags:
       - 'v*.*.*'
   pull_request:
-    branches: [ main ]
+    branches: [ main,beta ]
   workflow_dispatch:
 
 jobs:
@@ -206,7 +206,7 @@ jobs:
         run: |
           mkdir build
           cp -r src composer.json LICENSE README.md build/
-          echo "v${{ github.run_number }}" > build/VERSION
+          echo "${{ github.run_number }}" > build/VERSION
           cd build && zip -r ../laika-model.zip .
 
       - name: Upload build artifact
@@ -218,10 +218,9 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.ref_name }}
-          name: "Laika Model v${{ github.ref_name }}"
-          body: |
-            $(git for-each-ref refs/tags/${{ github.ref_name }} --format='%(contents)')
+          tag_name: ${{ github.ref_name }}
+          name: "Laika Model ${{ github.ref_name }}"
+          body: "Laika Model Automated Release Build for ${{ github.ref_name }}."
           files: laika-model.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
