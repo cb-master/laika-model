@@ -36,9 +36,9 @@ class Blueprint
      * @param string $name Column name. Default is 'id'
      * @param string $type Column type (INT or BIGINT). Default is 'INT'
      * @param bool $unsigned Whether the column is unsigned. Default is true
-     * @return object
+     * @return self
      */
-    public function id(string $name = 'id', string $type = 'INT', bool $unsigned = true):object
+    public function id(string $name = 'id', string $type = 'INT', bool $unsigned = true): self
     {
         $type = strtoupper($type);
         if (!in_array($type, ['INT', 'BIGINT'])) {
@@ -56,9 +56,9 @@ class Blueprint
      * @param int $length Length of the VARCHAR column. Default id 255
      * @param bool $null Whether the column is nullable. Default is false
      * @param string $default Default value for the column
-     * @return object
+     * @return self
      */
-    public function string(string $name, int $length = 255, bool $null = false, string $default = ''):object
+    public function string(string $name, int $length = 255, bool $null = false, string $default = ''): self
     {
         $null = $null ? ' NULL' : ' NOT NULL';
         $default = $default ? " DEFAULT '{$default}'" : '';
@@ -70,9 +70,9 @@ class Blueprint
     /**
      * @param string $name Column name. Required Argument
      * @param bool $null Whether the column is nullable. Default is false
-     * @return object
+     * @return self
      */
-    public function text(string $name, bool $null = false):object
+    public function text(string $name, bool $null = false): self
     {
         $null = $null ? ' NULL' : ' NOT NULL';
         $this->columns[] = "{$name} TEXT{$null}";
@@ -113,9 +113,9 @@ class Blueprint
      * @param string $type Column type (INT or BIGINT). Default is 'INT'
      * @param bool $unsigned Whether the column is unsigned. Default is true
      * @param bool $nullable Whether the column is nullable. Default is false
-     * @return object
+     * @return self
      */
-    public function integer(string $name, string $type = 'INT', bool $unsigned = true, bool $null = false):object
+    public function integer(string $name, string $type = 'INT', bool $unsigned = true, bool $null = false): self
     {
         $type = strtoupper($type);
         if (!in_array($type, ['INT', 'BIGINT'])) {
@@ -131,9 +131,9 @@ class Blueprint
     /**
      * @param string $name Column name. Required Argument
      * @param bool $nullable Whether the column is nullable. Default is false
-     * @return object
+     * @return self
      */
-    public function boolean(string $name, bool $null = false):object
+    public function boolean(string $name, bool $null = false): self
     {
         $nullable = $null ? ' NULL' : ' NOT NULL';
         $this->columns[] = "{$name} BOOLEAN{$nullable}";
@@ -146,9 +146,9 @@ class Blueprint
      * @param int $precision Precision of the DECIMAL column. Default is 10
      * @param int $scale Scale of the DECIMAL column. Default is 2
      * @param bool $nullable Whether the column is nullable. Default is false
-     * @return object
+     * @return self
      */
-    public function decimal(string $name, int $precision = 10, int $scale = 2, bool $null = false):object
+    public function decimal(string $name, int $precision = 10, int $scale = 2, bool $null = false): self
     {
         $nullable = $null ? ' NULL' : ' NOT NULL';
         $this->columns[] = "{$name} DECIMAL({$precision}, {$scale}){$nullable}";
@@ -159,9 +159,9 @@ class Blueprint
     /**
      * @param string $name Column name. Required Argument
      * @param bool $nullable Whether the column is nullable. Default is false
-     * @return object
+     * @return self
      */
-    public function float(string $name, bool $null = false):object
+    public function float(string $name, bool $null = false): self
     {
         $nullable = $null ? ' NULL' : ' NOT NULL';
         $this->columns[] = "{$name} FLOAT{$nullable}";
@@ -177,7 +177,7 @@ class Blueprint
      * @param bool $null Whether the column is nullable. Default is false.
      * @return self
      */
-    public function enum(string $name, array $values, ?string $default = null, bool $null = false):self
+    public function enum(string $name, array $values, ?string $default = null, bool $null = false): self
     {
         if(empty($values)){
             throw new InvalidArgumentException("ENUM column must have at least one allowed value.");
@@ -203,9 +203,9 @@ class Blueprint
     /**
      * @param string $name Column name. Required Argument
      * @param bool $nullable Whether the column is nullable. Default is false
-     * @return object
+     * @return self
      */
-    public function datetime(string $name, bool $null = false):object
+    public function datetime(string $name, bool $null = false): self
     {
         $nullable = $null ? ' NULL' : ' NOT NULL';
         $this->columns[] = "{$name} DATETIME{$nullable}";
@@ -214,9 +214,9 @@ class Blueprint
 
     // created_at and updated_at TIMESTAMP columns
     /**
-     * @return object
+     * @return self
      */
-    public function timestamps():object
+    public function timestamps(): self
     {
         $this->columns[] = "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
         $this->columns[] = "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
@@ -228,9 +228,9 @@ class Blueprint
      * @param string $column Column name. Required Argument
      * @param string $referencedTable Referenced table name. Required Argument
      * @param string $referencedColumn Referenced column name. Default is 'id'
-     * @return object
+     * @return self
      */
-    public function foreign(string $column, string $referencedTable, string $referencedColumn = 'id'):object
+    public function foreign(string $column, string $referencedTable, string $referencedColumn = 'id'): self
     {
         $this->foreignKeys[] = "FOREIGN KEY ({$column}) REFERENCES {$referencedTable}({$referencedColumn})";
         return $this;
@@ -239,9 +239,9 @@ class Blueprint
     // Primary Key
     /**
      * @param string $column Array of column names. Required Argument
-     * @return object
+     * @return self
      */
-    public function primary(string $column):object
+    public function primary(string $column): self
     {
         $this->primaryKeys = [$column];
         return $this;
@@ -251,9 +251,9 @@ class Blueprint
     /**
      * @param string $column Column name. Required Argument
      * @param int $length Length of the unique key. Default is null
-     * @return object
+     * @return self
      */
-    public function unique(string $column, int $length = null):object
+    public function unique(string $column, int $length = null): self
     {
         $this->uniqueKeys[] = [$column . ($length ? "({$length})" : '')];
         return $this;
@@ -263,9 +263,9 @@ class Blueprint
     /**
      * @param string $column Column name. Required Argument
      * @param ?int $length Length of the index key. Default is null
-     * @return object
+     * @return self
      */
-    public function index(string $column, ?int $length = null):object
+    public function index(string $column, ?int $length = null): self
     {
         $this->indexes[] = [$column . ($length ? "({$length})" : '')];
         return $this;
@@ -274,9 +274,9 @@ class Blueprint
     // Storage engine
     /**
      * @param string $engine Storage engine. Required Argument (e.g., InnoDB, MyISAM, etc.)
-     * @return object
+     * @return self
      */
-    public function engine(string $engine):object
+    public function engine(string $engine): self
     {
         $this->engine = strtoupper($engine);
         return $this;
@@ -285,9 +285,9 @@ class Blueprint
     // Character set
     /**
      * @param string $charset Character set. Required Argument (e.g., utf8mb4, latin1, etc.)
-     * @return object
+     * @return self
      */
-    public function charset(string $charset):object
+    public function charset(string $charset): self
     {
         $this->charset = $charset;
         return $this;
@@ -296,9 +296,9 @@ class Blueprint
     // Collation
     /**
      * @param string $collation Collation. Required Argument (e.g., utf8mb4_unicode_ci, utf8mb4_general_ci, etc.)
-     * @return object
+     * @return self
      */
-    public function collation(string $collation): object
+    public function collation(string $collation): self
     {
         $this->collation = $collation;
         return $this;

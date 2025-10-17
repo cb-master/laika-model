@@ -37,9 +37,9 @@ abstract class Model
      * @param array $where Optional parameter. Default is []
      * @param string $operator Optional parameter. Default is '='
      * @param string $compare Optional parameter. Default is 'AND'
-     * @return array
+     * @return array<int,array>
      */
-    public function all(array $where = [], string $operator = '=', string $compare = 'AND'):array
+    public function all(array $where = [], string $operator = '=', string $compare = 'AND'): array
     {
         // $db = DB::getInstance($this->name)->table($this->table);
         return $where ? $this->db->table($this->table)->where($where, $operator, compare:$compare)->get() :
@@ -50,9 +50,9 @@ abstract class Model
      * @param array $where Required parameter.
      * @param string $operator Optional parameter. Default is '='
      * @param string $compare Optional parameter. Default is 'OR'
-     * @return array
+     * @return array<int,array>
      */
-    public function find(array $where, string $operator = '=', string $compare = 'OR'):array
+    public function find(array $where, string $operator = '=', string $compare = 'OR'): array
     {
         return $this->db->table($this->table)->where($where, $operator, compare:$compare)->get();
     }
@@ -61,9 +61,9 @@ abstract class Model
      * @param array $where Required parameter.
      * @param string $operator Optional parameter. Default is '='
      * @param string $compare Optional parameter. Default is 'OR'
-     * @return array
+     * @return array<int,array>
      */
-    public function first(array $where, string $operator = '=', string $compare = 'AND'):array
+    public function first(array $where, string $operator = '=', string $compare = 'AND'): array
     {
         return $this->db->table($this->table)->where($where, $operator, compare:$compare)->first();
     }
@@ -74,7 +74,7 @@ abstract class Model
      * @param string $compare Optional parameter. Default is 'AND'
      * @return int
      */
-    public function delete(array $where, string $operator = '=', string $compare = 'AND'):int
+    public function delete(array $where, string $operator = '=', string $compare = 'AND'): int
     {
         return $this->db->table($this->table)->where($where, $operator, compare:$compare)->delete();
     }
@@ -83,7 +83,7 @@ abstract class Model
      * @param array $data Required parameter.
      * @return int
      */
-    public function insert(array $data):int
+    public function insert(array $data): int
     {
         return $this->db->table($this->table)->insert($data);
     }
@@ -92,7 +92,7 @@ abstract class Model
      * @param array $rows Required parameter.
      * @return int
      */
-    public function insertMany(array $rows):bool
+    public function insertMany(array $rows): bool
     {
         return $this->db->table($this->table)->insertMany($rows);
     }
@@ -102,7 +102,7 @@ abstract class Model
      * @param array $data Required parameter.
      * @return int
      */
-    public function update(array $where, array $data):int
+    public function update(array $where, array $data): int
     {
         return $this->db->table($this->table)->where($where)->update($data);
     }
@@ -112,13 +112,13 @@ abstract class Model
      * @param ?string $column Optional Argument. Default is null
      * @return string
      */
-    public function uuid(?string $column = null):string
+    public function uuid(?string $column = null): string
     {
         $column = $column ?: $this->uuid;
         $time = substr(str_replace('.', '', microtime(true)), -6);
         $uid = 'uuid-'.bin2hex(random_bytes(3)).'-'.bin2hex(random_bytes(3)).'-'.bin2hex(random_bytes(3)).'-'.bin2hex(random_bytes(3)).'-'.$time;
         // Check Already Exist & Return
-        if($this->db->table($this->table)->where($column, '=', $uid)->first()){
+        if ($this->db->table($this->table)->where($column, '=', $uid)->first()) {
             return $this->uuid($column);
         }
         return $uid;

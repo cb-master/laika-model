@@ -25,7 +25,7 @@ class Mysql
         $host = $config['host'] ?? 'localhost';
 
         // Check 'database' key exists
-        if(!isset($config['database']) && !$config['database']){
+        if (!isset($config['database']) && !$config['database']) {
             throw new RuntimeException("'database' Key Missing or Invalid!");
         }
         $database = $config['database'];

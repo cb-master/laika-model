@@ -26,7 +26,7 @@ class Schema
      * @param string $name Optional Argument
      * @return void
      */
-    public static function setConnection(string $name = 'default'):void
+    public static function setConnection(string $name = 'default'): void
     {
         static::$pdo = ConnectionManager::get($name);
     }
@@ -37,7 +37,7 @@ class Schema
      * @param callable $callback Required Argument
      * @return void
      */
-    public static function create(string $table, callable $callback):void
+    public static function create(string $table, callable $callback): void
     {
         $blueprint = new Blueprint($table);
         $callback($blueprint);
@@ -52,7 +52,7 @@ class Schema
      * @param string $table Required Argument
      * @return void
      */
-    public static function drop(string $table):void
+    public static function drop(string $table): void
     {
         // Make sure table name is valid, no user inputs should be allowed
         $table = self::sanitizeTableName($table);
@@ -66,7 +66,7 @@ class Schema
      * @param string $sql Required Argument
      * @return void
      */
-    protected static function execute(string $sql):void
+    protected static function execute(string $sql): void
     {
         try{
             if(empty(self::$pdo)){
@@ -84,7 +84,7 @@ class Schema
      * @param string $table Required Argument
      * @return string
      */
-    protected static function sanitizeTableName(string $table):string
+    protected static function sanitizeTableName(string $table): string
     {
         return preg_replace('/[^a-zA-Z0-9_]/', '', $table);
     }

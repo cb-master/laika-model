@@ -21,7 +21,7 @@ class Transaction Extends DB
     /**
      * @param Closure $callback Required Argument.
      * @param string $connection_name Optional Argument. Default is 'default'
-     * @return array Example ['error'=>false, 'message'=>'Anything']
+     * @return array<string,mixed> Example ['error'=>false, 'message'=>'Anything']
      */
     public static function run(Closure $callback, string $connection_name = 'default'): array
     {

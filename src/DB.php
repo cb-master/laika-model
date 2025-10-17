@@ -162,9 +162,9 @@ class DB
     /**
      * @param string $column Required column name
      * @param string $compare Optional comparison type (AND, OR)
-     * @return object Returns the DB instance
+     * @return self Returns the DB instance
      */
-    public function whereNull(string $column, string $compare = 'AND'): object
+    public function whereNull(string $column, string $compare = 'AND'): self
     {
         $this->addWhere("{$column} IS NULL", [], strtoupper($compare));
         return $this;
@@ -176,9 +176,9 @@ class DB
      * @param mixed $value1 Required first value
      * @param mixed $value2 Required second value
      * @param string $compare Optional comparison type (AND, OR)
-     * @return object Returns the DB instance
+     * @return self Returns the DB instance
      */
-    public function whereBetween(string $column, mixed $value1, mixed $value2, string $compare = 'AND'): object
+    public function whereBetween(string $column, mixed $value1, mixed $value2, string $compare = 'AND'): self
     {
         $this->addWhere("{$column} BETWEEN ? AND ?", [$value1, $value2], strtoupper($compare));
         return $this;
@@ -188,9 +188,9 @@ class DB
     /**
      * @param callable $callback Required callback function to build the group
      * @param string $compare Optional comparison type (AND, OR)
-     * @return object Returns the DB instance
+     * @return self Returns the DB instance
      */
-    public function whereGroup(callable $callback, string $compare = 'AND'): object
+    public function whereGroup(callable $callback, string $compare = 'AND'): self
     {
         $newQuery = new self($this->name);
 
@@ -211,9 +211,9 @@ class DB
     // Set Group By
     /**
      * @param string ...$columns Required columns to group by
-     * @return object Returns the DB instance
+     * @return self Returns the DB instance
      */
-    public function groupBy(string ...$columns): object
+    public function groupBy(string ...$columns): self
     {
         $this->groupBy = $columns;
         return $this;
@@ -224,9 +224,9 @@ class DB
      * @param string $column Required column name
      * @param string $operator Required operator
      * @param mixed $value Required value
-     * @return object Returns the DB instance
+     * @return self Returns the DB instance
      */
-    public function having(string $column, string $operator, mixed $value): object
+    public function having(string $column, string $operator, mixed $value): self
     {
         $this->having[] = "{$column} {$operator} ?";
         $this->bindings[] = $value;
@@ -237,9 +237,9 @@ class DB
     /**
      * @param string $column Required column name
      * @param string $direction Optional direction (ASC, DESC)
-     * @return object Returns the DB instance
+     * @return self Returns the DB instance
      */
-    public function orderBy(string $column, string $direction = 'ASC'): object
+    public function orderBy(string $column, string $direction = 'ASC'): self
     {
         $column = strtoupper($column);
         $this->orderBy[] = "{$column} {$direction}";
@@ -249,9 +249,9 @@ class DB
     // Set Limit
     /**
      * @param int|string $limit Required limit
-     * @return object Returns the DB instance
+     * @return self Returns the DB instance
      */
-    public function limit(int|string $limit): object
+    public function limit(int|string $limit): self
     {
         $this->limit = (int) $limit;
         return $this;
@@ -260,9 +260,9 @@ class DB
     // Set Offset
     /**
      * @param int|string $page Optional Argument. Default is Page Number 1
-     * @return object Returns the DB instance
+     * @return self Returns the DB instance
      */
-    public function offset(int|string $page = 1): object
+    public function offset(int|string $page = 1): self
     {
         $offset = ((int)$page - 1) * (int) $this->limit;
         $this->offset = ($offset < 0) ? 0 : $offset;
@@ -405,7 +405,7 @@ class DB
      */
     public function update(array $data): int
     {
-        if(empty($this->wheres)) {
+        if (empty($this->wheres)) {
             throw new InvalidArgumentException("No WHERE clause provided for UPDATE operation.");
         }
         $set = [];
@@ -436,7 +436,7 @@ class DB
     public function delete(): int
     {
         $sql = "DELETE FROM {$this->table}";
-        if(empty($this->wheres)) {
+        if (empty($this->wheres)) {
             throw new InvalidArgumentException("No WHERE clause provided for DELETE operation.");
         }
 
