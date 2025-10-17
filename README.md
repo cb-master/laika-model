@@ -16,93 +16,87 @@ Cloud Bill Master Singleton Database Model is a PHP-based project that implement
 * <b>PDO (PHP Data Objects)</b>: Utilized for secure database access with prepared statements to prevent SQL injection.</br>
 
 ## Installation
-Use Without Composer:
-Download the source code and copy it in your application directory. For manual installation, please remove the require vendor autoload file and use the '*model.php*' file from the repository.
-```php
-require_once('path/cbm-model/model.php');
-```
 Install with composer:
 ```bash
-composer require cb-master/cb-model
+composer require cb-master/laika-model
 ```
-
+##  Connection Manager
 Configure your database settings in your PHP application page top section.
+To config use <b>ConnectionManager::add(array $config, string $name = 'default')</b>.
+Array $config:
+    * 'driver'  => [Required]: Accepted mysql/pgsql/sqlite. Example: mysql
+    * 'host'    => [Optional]: localhost/127.0.0.1 || [Required]: If Foreign. Example: otherhost
+    * 'port'    => [Optional]: 3306 || [Required]: If Port is Not 3306
+    * 'database'=> [Required]: Your Database Name. Example: 'dbname'
+    * 'username'=> [Required]: Your Database Username. Example: 'db_username'
+    * 'password'=> [Required]: Your Database Password. Example: 'db_password'
+
+String $name: Default is 'default'. Has Read & Write Access
+
 ```php
-use CBM\Model\Model;
+use Laika\Model\ConnectionManager;
 
 // Require Autoload File
 require_once("./vendor/autoload.php");
+// Add Default Connection Manager
+ConnectionManager::add(array $config); // DB Default Connection Details for Read & Write both
 
-// Config DB Model
-Model::config([
-    'driver'    =>  'mysql',
-    'host'      =>  'localhost',
-    'name'      =>  'database_name',
-    'user'      =>  'database_user_here',
-    'password'  =>  'database_password_here'
-]);
-
-// Add 'port' Key if you are not using the default port.
 /**
- * Model::config([
- *  'driver'    =>  'mysql',
- *  'host'      =>  'localhost',
- *  'port'      =>  12345,
- *  'name'      =>  'database_name',
- *  'user'      =>  'database_user_here',
- *  'password'  =>  'database_password_here',
- * ])
- * */
-
-```
-By default fetching data as object. But you can fetch data as array.
- ```php
-// Config DB Model
-Model::config([
-    'driver'    =>  'mysql',
-    'host'      =>  'localhost',
-    'name'      =>  'database_name',
-    'user'      =>  'database_user_here',
-    'password'  =>  'database_password_here',,
-    'object'    =>  false
-]);
-```
-You can ignore the driver key if you are using the mysql driver. Mysql is the default driver in this system.
- ```php
-// Config DB Model
-Model::config([
-    'host'      =>  'localhost',
-    'name'      =>  'database_name',
-    'user'      =>  'database_user_here',
-    'password'  =>  'database_password_here',
-]);
+ * Add Multiple Connection Manager. Default is for read, write or foreign
+ */
+ConnectionManager::add(array $config, 'other'); // DB Another Connection for Read & Write. Local or Foreign
+ConnectionManager::add(array $ReadDbConfig, 'read'); // DB Connection Details for Read
+ConnectionManager::add(array $WriteDbConfig, 'write'); // DB Connection Details for Write
 ```
 ## Usage
 This project provides a base for any PHP application needing a reliable and efficient database model, especially useful for billing and cloud services. For detailed usage examples, please see the given method implementation below.
 
-### Get Data From Table
+### Get PDO Connection
 ```php
-// Get All Data With Select *
-Model::table('table_name')->get();
+// Get Default PDO Connection
+$pdo = ConnectionManager::get();
 
-// Get All Data With Selected Columns
-Model::table('table_name')->get('column_1, column_2, column_3, .....');
-
-// Get Single Data
-Model::table('table_name')->single();
-
+// Get Read PDO Connection if Configured
+$pdo = ConnectionManager::get('read');
+// Get Write PDO Connection if Configured
+$pdo = ConnectionManager::get('write');
+// Get Other PDO Connection if Configured
+$pdo = ConnectionManager::get('other');
 ```
-### Get Data From Table
-Use Where Clause. Where clause need 3 arguments {where(array $where, string $operator = '=', string $compare = 'AND')} where 1st one is required.
+Now you can execute any query bu using any PDO methods.
+### Get Laika Model Prebuild Methods
+To use Laika Prebuild methods instead of PDO Methods you can use DB Class from Laika model.
+
 ```php
-// Get All Data
-Model::table('table_name')->where(['status'=>'active'])->get();
+use Laika\Model\DB;
 
-// Get All Data With Multiple Array Keys
-Model::table('table_name')->where(['status'=>'active', 'email'=>'verified'])->get();
+// Get Default DB Model
+$db = DB::getInstance();
 
-// Get Data With Multiple where() method.
-Model::table('table_name')->where(['status'=>'active'])->where(['id'=>10], '>')->get();
+// Get Read DB Model if Configured
+$db = DB::getInstance('read');
+// Get Write DB Model if Configured
+$db = DB::getInstance('write');
+// Get Other DB Model if Configured
+$db = DB::getInstance('other');
+
+// Get All Columns Data from Table
+$data = $db->table('table')->get();
+
+// Get Selected Columns Data from Table
+$data = $db->table('table')->select('column1,column2,column3')->get();
+
+// Get Data from Table By Using Strings in Where Clause
+$data = $db->table('table')->where('column', '=', 'value')->get();
+// OR
+// Get Data from Table By Using Array in Where Clause
+$data = $db->table('table')->where(['id' => 1,'country'=>'usa'], '=', null, 'AND')->get();
+
+
+
+
+
+
 
 ```
 Use between() method. Its like where. You also can use it with where() method. Between method needs 3 arguments {between(string $column, int|string $min, int|string $max, string $compare = 'AND')}
