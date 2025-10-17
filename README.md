@@ -64,8 +64,8 @@ $pdo = ConnectionManager::get('write');
 $pdo = ConnectionManager::get('other');
 ```
 Now you can execute any query by using any PDO methods.
-### Get Laika Model Prebuild Methods
-To use Laika Prebuild methods instead of PDO Methods you can use DB Class from Laika model.
+### Get Laika Model Pre-build Methods
+To use Laika Pre-build methods instead of PDO Methods you can use DB Class from Laika model.
 
 ```php
 use Laika\Model\DB;
