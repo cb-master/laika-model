@@ -35,7 +35,7 @@ class UnitTest extends TestCase
             ]
         };
 
-        $conn = ConnectionManager::add($config);
-        $this->assertNotNull($conn, "Failed to initialize connection for {$driver}");
+        ConnectionManager::add($config);
+        $this->assertNotNull(ConnectionManager::get(), "Failed to initialize connection for {$driver}");
     }
 }
