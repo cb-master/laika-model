@@ -219,7 +219,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: "Laika Model ${{ github.ref_name }}"
+          name: "Release ${{ github.ref_name }}"
           body: "Laika Model Automated Release Build for ${{ github.ref_name }}."
           files: laika-model.zip
         env:
