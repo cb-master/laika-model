@@ -251,10 +251,10 @@ class Blueprint
     // Unique Key
     /**
      * @param string $column Column name. Required Argument
-     * @param int $length Length of the unique key. Default is null
+     * @param ?int $length Length of the unique key. Default is null
      * @return self
      */
-    public function unique(string $column, int $length = null): self
+    public function unique(string $column, ?int $length = null): self
     {
         $this->uniqueKeys[] = [$column . ($length ? "({$length})" : '')];
         return $this;
