@@ -5,7 +5,7 @@
  * Author: Showket Ahmed
  * Email: riyadhtayf@gmail.com
  * License: MIT
- * This file is part of the Laika PHP MVC Framework.
+ * This file is part of the Laika Framework.
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace Laika\Model;
 
+use PDOException;
+use Throwable;
+
 abstract class Model
 {
     // Database Object
-    public Db $db;
+    public DB $db;
 
     // Table Name
     public string $table;
@@ -25,7 +28,7 @@ abstract class Model
     public string $id;
 
     // Table UUID Column Name
-    public string $uuid;
+    public string $uuid = 'uuid';
 
     // protected string $name;
 
@@ -33,6 +36,11 @@ abstract class Model
     {
         $this->db = DB::getInstance($name);
     }
+
+    /**
+     * Create Table if Does not Exists
+     */
+    abstract public function migrate();
 
     /**
      * @param array $where Optional parameter. Default is []
@@ -108,19 +116,17 @@ abstract class Model
         return $this->db->table($this->table)->where($where)->update($data);
     }
 
-    // Generate UUID
     /**
-     * @param ?string $column Optional Argument. Default is null
+     * Generate UUID
      * @return string
      */
-    public function uuid(?string $column = null): string
+    public function uuid(): string
     {
-        $column =   $column ?: $this->uuid;
-        $time   =   substr(str_replace('.', '', microtime(true)), -6);
-        $uid    =   'uuid-'.bin2hex(random_bytes(3)).'-'.bin2hex(random_bytes(3)).'-'.bin2hex(random_bytes(3)).'-'.bin2hex(random_bytes(3)).'-'.$time;
+        $time = substr(str_replace('.', '', microtime(true)), -6);
+        $uid = 'uuid-' . bin2hex(random_bytes(3)) . '-' . bin2hex(random_bytes(3)) . '-' . bin2hex(random_bytes(3)) . '-' . bin2hex(random_bytes(3)) . '-' . $time;
         // Check Already Exist & Return
-        if ($this->db->table($this->table)->where($column, '=', $uid)->first()) {
-            return $this->uuid($column);
+        if ($this->db->table($this->table)->where($this->uuid, '=', $uid)->first()) {
+            return $this->uuid();
         }
         return $uid;
     }
@@ -129,7 +135,8 @@ abstract class Model
     public function count(string $column = null, array $where = [], string $operator = '=', string $compare = 'AND'): int
     {
         $column = $column ?: $this->id;
-        return $where ? $this->db->table($this->table)->where($where, $operator, null, $compare)->count($column) :
-                        $this->db->table($this->table)->count($column);
+        return $where ?
+                $this->db->table($this->table)->where($where, $operator, null, $compare)->count($column) :
+                $this->db->table($this->table)->count($column);
     }
 }

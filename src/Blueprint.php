@@ -5,7 +5,7 @@
  * Author: Showket Ahmed
  * Email: riyadhtayf@gmail.com
  * License: MIT
- * This file is part of the Laika PHP MVC Framework.
+ * This file is part of the Laika Laika Framework.
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
@@ -19,7 +19,7 @@ class Blueprint
 {
     protected string $table;
     protected array $columns = [];
-    protected array $primaryKeys = [];
+    protected string $primaryKeys = '';
     protected array $uniqueKeys = [];
     protected array $indexes = [];
     protected array $foreignKeys = [];
@@ -47,7 +47,8 @@ class Blueprint
         }
         $unsignedFlag = $unsigned ? ' UNSIGNED' : '';
         $this->columns[] = "{$name} {$type}{$unsignedFlag} AUTO_INCREMENT";
-        $this->primaryKeys[] = $name; // Adds to primary keys
+        // Adds to primary keys
+        $this->primaryKeys = trim($name);
         return $this;
     }
 
@@ -244,7 +245,7 @@ class Blueprint
      */
     public function primary(string $column): self
     {
-        $this->primaryKeys = [$column];
+        $this->primaryKeys = trim($column);
         return $this;
     }
 
@@ -313,7 +314,7 @@ class Blueprint
         $sql .= implode(", ", $this->columns);
 
         // Primary Key
-        $sql .= !empty($this->primaryKeys) ? ", PRIMARY KEY (" . implode(", ", $this->primaryKeys) . ")" : '';
+        $sql .= !empty($this->primaryKeys) ? ", PRIMARY KEY ({$this->primaryKeys})" : '';
         // Unique Keys
         // $uniqueKeysSQL = '';
         foreach ($this->uniqueKeys as $uniqueColumns) {
